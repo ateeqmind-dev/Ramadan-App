@@ -140,11 +140,13 @@
         .icon-btn svg { width: 20px; height: 20px; fill: var(--gold); transition: transform 0.3s ease; }
         .icon-btn:active svg { transform: scale(0.9); }
 
-        .branding { font-size: 13px; letter-spacing: 2px; color: var(--gold); margin-bottom: 1.5vh; font-weight: 600; font-family: var(--font-main); }
         .mosque-icon svg { width: 45px; height: auto; fill: var(--gold); margin-bottom: 1.5vh; }
-        .date-display { font-size: clamp(18px, 5.5vw, 24px); font-weight: 700; margin-bottom: 5px; font-family: var(--font-main); direction: ltr; }
+        
+        /* New Date Styles */
+        .islamic-date { font-size: clamp(22px, 6.5vw, 28px); font-weight: 700; margin-bottom: 2px; font-family: var(--font-main); direction: ltr; }
+        .english-date { font-size: clamp(14px, 4vw, 16px); font-weight: 400; margin-bottom: 6px; font-family: var(--font-main); direction: ltr; opacity: 0.85; }
+        
         .day-display { font-size: 14px; font-weight: 300; letter-spacing: 1px; color: #ccc; }
-
         /* BOTTOM SECTION */
         .bottom-section {
             padding: 2vh 20px;
@@ -213,6 +215,27 @@
         /* Dua Modal Specific */
         .dua-arabic { font-family: 'Amiri', serif, sans-serif; font-size: 26px; line-height: 2; text-align: center; color: var(--text-dark); margin: 20px 0; direction: rtl; font-weight: bold;}
         .dua-trans { text-align: center; color: var(--text-dark); font-size: 14px; opacity: 0.8; margin-bottom: 10px;}
+/* Ensure the credit text stays visible and format it */
+        .credit {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-dark);
+            opacity: 0.7;
+            padding: 5px 0 15px;
+            flex-shrink: 0; /* Prevents flexbox from pushing it out of the container */
+        }
+
+        /* Tweak flexbox spacing when the taller Urdu font is active */
+        body.lang-ur .bottom-section {
+            justify-content: space-between;
+            gap: 1vh;
+            padding-top: 1.5vh;
+            padding-bottom: 1vh;
+        }
+        
+        body.lang-ur .title-text {
+            line-height: 1.3; /* Keeps Nastaliq from creating massive gaps */
+        }
     </style>
 </head>
 <body>
@@ -241,13 +264,12 @@
             </button>
         </div>
 
-        <div class="branding">DAWAT-E-ISLAMI</div>
         <div class="mosque-icon">
             <svg viewBox="0 0 24 24"><path d="M12 2C10.89 2 10 2.89 10 4V4.5C8.82 5.06 8 6.42 8 8V12H4V14H6V22H18V14H20V12H16V8C16 6.42 15.18 5.06 14 4.5V4C14 2.89 13.11 2 12 2M12 4C12.55 4 13 4.45 13 5V5.5C13 5.5 13 6 12 6C11 6 11 5.5 11 5.5V5C11 4.45 11.45 4 12 4M12 7C14.21 7 16 8.79 16 11V12H8V11C8 8.79 9.79 7 12 7Z" /></svg>
         </div>
-        <div class="date-display" id="date-display">-- / --</div>
-        <div class="day-display" id="day-display" data-i18n-day="--">--</div>
-    </div>
+        <div class="islamic-date" id="islamic-date">--</div>
+        <div class="english-date" id="english-date">--</div>
+        <div class="day-display" id="day-display" data-i18n-day="--">--</div>    </div>
 
     <div class="bottom-section">
         <div class="title-text" data-i18n="mainTitle">SAHAR-O-IFTAR TIMING</div>
@@ -355,6 +377,7 @@
             untilSahar: "Time until Sahar", untilIftar: "Time until Iftar",
             finishEating: "Finish Eating!", saharEnded: "Sahar Time Ended", iftarTimeMsg: "It's Iftar Time!",
             ramadanMubarak: "Ramadan Mubarak!", calendarTitle: " Calendar",
+            ramadan: "RAMADAN",
             KARACHI: "KARACHI", LAHORE: "LAHORE", ISLAMABAD: "ISLAMABAD",
             days: ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"],
             months: ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
@@ -367,6 +390,7 @@
             untilSahar: "سحر میں باقی وقت", untilIftar: "افطار میں باقی وقت",
             finishEating: "کھانا ختم کریں!", saharEnded: "سحر کا وقت ختم ہو گیا", iftarTimeMsg: "افطار کا وقت ہو گیا ہے!",
             ramadanMubarak: "رمضان مبارک!", calendarTitle: " کیلنڈر",
+            ramadan: "رمضان",
             KARACHI: "کراچی", LAHORE: "لاہور", ISLAMABAD: "اسلام آباد",
             days: ["اتوار", "پیر", "منگل", "بدھ", "جمعرات", "جمعہ", "ہفتہ"],
             months: ["جنوری", "فروری", "مارچ", "اپریل", "مئی", "جون", "جولائی", "اگست", "ستمبر", "اکتوبر", "نومبر", "دسمبر"]
@@ -496,7 +520,8 @@
         const dateObj = parseAppDate(todayData[1]);
         
         document.getElementById('selected-city').innerText = t(currentCity);
-        document.getElementById('date-display').innerText = `${String(dateObj.getDate()).padStart(2, '0')} ${t('months')[dateObj.getMonth()]} / ${String(todayData[0]).padStart(2, '0')} RAMADAN`;
+        document.getElementById('islamic-date').innerText = `${String(todayData[0]).padStart(2, '0')} ${t('ramadan')}`;
+        document.getElementById('english-date').innerText = `${String(dateObj.getDate()).padStart(2, '0')} ${t('months')[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
         document.getElementById('day-display').innerText = t('days')[dateObj.getDay()];
         
         document.getElementById('sahar-time').innerText = todayData[2];
